@@ -1,2 +1,0 @@
-# aduuro
-aktie
