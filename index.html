@@ -1,0 +1,1678 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ADUR | Aduro Clean Technologies — Live Wall Street Terminal</title>
+    <meta name="description" content="Officiell live-terminal för Aduro Clean Technologies (NASDAQ: ADUR). Äkta realtidskurser från TradingView, teknisk analysmätare, multi-valuta innehavskalkylator, katalysator-färdplan och marknadsklocka.">
+    <meta name="keywords" content="ADUR, Aduro Clean Technologies, Aktie, NASDAQ, Investering, Kurs, Innehavskalkylator, Wolf of Wall Street, HCT Technology">
+    <meta name="author" content="ADUR Bull Community">
+
+    <!-- Open Graph / Social Media Meta Tags -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://mathi.github.io/adur-terminal/">
+    <meta property="og:title" content="ADUR | Aduro Clean Technologies — Live Wall Street Terminal">
+    <meta property="og:description" content="Äkta realtidsdiagram från TradingView, Köp/Sälj-analys, Innehavskalkylator (SEK/EUR/USD/NOK/DKK), Katalysatorer & Valutakurser för ADUR.">
+    <meta property="og:image" content="https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?q=80&w=1200&auto=format&fit=crop">
+
+    <!-- Twitter / X Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="ADUR | Aduro Clean Technologies — Live Wall Street Terminal">
+    <meta name="twitter:description" content="Äkta realtidsdata, Teknisk Signal (KÖP/SÄLJ), Innehavskalkylator och nyheter för Aduro Clean Technologies.">
+    <meta name="twitter:image" content="https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?q=80&w=1200&auto=format&fit=crop">
+
+    <!-- Favicon: Guldig Wolf / Varg SVG -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%23f59e0b'/%3E%3Cstop offset='50%25' stop-color='%23fbbf24'/%3E%3Cstop offset='100%25' stop-color='%23d97706'/%3E%3C/linearGradient%3E%3C/defs%3E%3Cpath fill='url(%23g)' d='M50 5 L65 30 L90 25 L80 50 L95 70 L65 75 L50 95 L35 75 L5 70 L20 50 L10 25 L35 30 Z'/%3E%3Ccircle cx='40' cy='45' r='4' fill='%23000'/%3E%3Ccircle cx='60' cy='45' r='4' fill='%23000'/%3E%3C/svg%3E">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --bg-void: #060709;
+            --bg-card: rgba(15, 18, 24, 0.92);
+            --bg-card-hover: rgba(24, 29, 39, 0.96);
+            --border-gold: rgba(245, 158, 11, 0.35);
+            --border-subtle: rgba(255, 255, 255, 0.08);
+            --gold-primary: #f59e0b;
+            --gold-light: #fde68a;
+            --gold-gradient: linear-gradient(135deg, #d97706 0%, #fbbf24 50%, #f59e0b 100%);
+            --green-bull: #10b981;
+            --green-glow: rgba(16, 185, 129, 0.25);
+            --red-bear: #ef4444;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --font-mono: 'JetBrains Mono', monospace;
+            --font-serif: 'Cinzel', serif;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--bg-void);
+            color: var(--text-main);
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            overflow-x: hidden;
+            background-image: 
+                radial-gradient(circle at 15% 15%, rgba(217, 119, 6, 0.08) 0%, transparent 40%),
+                radial-gradient(circle at 85% 85%, rgba(16, 185, 129, 0.06) 0%, transparent 40%),
+                linear-gradient(to bottom, rgba(6, 7, 9, 0.85), var(--bg-void)),
+                radial-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 0);
+            background-size: 100% 100%, 100% 100%, 100% 100%, 32px 32px;
+            min-height: 100vh;
+            padding-bottom: 70px; /* Space for mobile bottom bar */
+        }
+
+        /* Top Ticker Bar */
+        .ticker-wrap {
+            width: 100%;
+            overflow: hidden;
+            background: rgba(8, 10, 14, 0.95);
+            border-bottom: 1px solid rgba(245, 158, 11, 0.2);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(12px);
+            padding: 8px 0;
+        }
+        .ticker-move {
+            display: flex;
+            width: max-content;
+            animation: ticker 32s linear infinite;
+        }
+        .ticker-wrap:hover .ticker-move {
+            animation-play-state: paused;
+        }
+        .ticker-item {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 0 24px;
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            font-weight: 600;
+            border-right: 1px solid var(--border-subtle);
+        }
+        .bull-up { color: var(--green-bull); }
+        .bear-down { color: var(--red-bear); }
+
+        @keyframes ticker {
+            0% { transform: translate3d(0, 0, 0); }
+            100% { transform: translate3d(-50%, 0, 0); }
+        }
+
+        /* Container */
+        .container {
+            max-width: 1380px;
+            margin: 0 auto;
+            padding: 20px 16px;
+        }
+
+        /* Hero Header */
+        .hero {
+            position: relative;
+            background: linear-gradient(180deg, rgba(20, 24, 33, 0.92) 0%, rgba(10, 12, 16, 0.98) 100%);
+            border: 1px solid var(--border-gold);
+            border-radius: 16px;
+            padding: 28px 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 20px 50px -10px rgba(0, 0, 0, 0.7), 0 0 30px rgba(245, 158, 11, 0.1);
+            overflow: hidden;
+        }
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; height: 3px;
+            background: var(--gold-gradient);
+        }
+        .hero-bg-overlay {
+            position: absolute;
+            top: 0; right: 0; bottom: 0; width: 45%;
+            background: url('https://images.unsplash.com/photo-1590283603385-fc7ffb09a475?q=80&w=1200&auto=format&fit=crop') center/cover no-repeat;
+            opacity: 0.16;
+            mask-image: linear-gradient(to left, rgba(0,0,0,1) 0%, transparent 100%);
+            -webkit-mask-image: linear-gradient(to left, rgba(0,0,0,1) 0%, transparent 100%);
+            pointer-events: none;
+        }
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        .hero-badge-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(245, 158, 11, 0.15);
+            border: 1px solid rgba(245, 158, 11, 0.4);
+            color: var(--gold-light);
+            padding: 4px 14px;
+            border-radius: 9999px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+        }
+        .sound-toggle-btn {
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid var(--border-subtle);
+            color: var(--gold-light);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.78rem;
+            font-family: var(--font-mono);
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s;
+        }
+        .sound-toggle-btn:hover {
+            background: var(--gold-primary);
+            color: #000;
+        }
+
+        .hero-title-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+        .hero-title {
+            font-family: var(--font-serif);
+            font-size: clamp(1.8rem, 4vw, 3rem);
+            font-weight: 900;
+            letter-spacing: 1px;
+            background: var(--gold-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 4px 20px rgba(245, 158, 11, 0.2);
+            line-height: 1.1;
+        }
+        .hero-subtitle {
+            color: var(--text-muted);
+            font-size: 1rem;
+            max-width: 680px;
+        }
+        .hero-quote-box {
+            background: rgba(0,0,0,0.3);
+            border-left: 3px solid #f59e0b;
+            padding: 8px 14px;
+            border-radius: 0 8px 8px 0;
+            margin-top: 6px;
+            max-width: 750px;
+        }
+        .hero-quote {
+            font-style: italic;
+            color: #fbbf24;
+            font-size: 0.92rem;
+            transition: opacity 0.4s ease;
+        }
+
+        /* TradingView Single Ticker Embed in Hero */
+        .tradingview-hero-box {
+            min-width: 260px;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid var(--border-gold);
+            background: rgba(0, 0, 0, 0.6);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+        }
+
+        /* Quick Stats Grid */
+        .quick-stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+            gap: 12px;
+            margin-top: 16px;
+        }
+        .stat-card {
+            background: rgba(10, 13, 18, 0.7);
+            border: 1px solid var(--border-subtle);
+            border-radius: 10px;
+            padding: 12px 14px;
+            transition: all 0.2s ease;
+        }
+        .stat-card:hover {
+            border-color: var(--border-gold);
+            transform: translateY(-2px);
+        }
+        .stat-label {
+            font-size: 0.72rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-muted);
+            margin-bottom: 4px;
+        }
+        .stat-value {
+            font-family: var(--font-mono);
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        /* Grid Layout */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 2.1fr 1fr;
+            gap: 24px;
+            margin-bottom: 24px;
+        }
+
+        @media (max-width: 1060px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Cards Generic */
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 16px;
+            padding: 24px;
+            position: relative;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+            margin-bottom: 24px;
+        }
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+        .card-title {
+            font-family: var(--font-serif);
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--gold-light);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Inline SVG icons */
+        .icon {
+            display: inline-block;
+            width: 1.25rem;
+            height: 1.25rem;
+            stroke-width: 2;
+            stroke: currentColor;
+            fill: none;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            vertical-align: middle;
+        }
+        .icon-gold { color: var(--gold-primary); }
+
+        /* Countdown & Market Clock */
+        .clock-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+        @media (max-width: 600px) {
+            .clock-container {
+                grid-template-columns: 1fr;
+            }
+        }
+        .clock-box {
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(245, 158, 11, 0.2);
+            border-radius: 12px;
+            padding: 16px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .clock-status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 6px;
+            animation: pulse-dot 2s infinite;
+        }
+        .status-open { background: var(--green-bull); box-shadow: 0 0 10px var(--green-bull); }
+        .status-closed { background: var(--red-bear); box-shadow: 0 0 10px var(--red-bear); }
+
+        @keyframes pulse-dot {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.4; transform: scale(0.85); }
+        }
+
+        .countdown-digits {
+            font-family: var(--font-mono);
+            font-size: 2.1rem;
+            font-weight: 800;
+            letter-spacing: 2px;
+            color: #ffffff;
+            margin: 8px 0;
+            text-shadow: 0 0 15px rgba(245, 158, 11, 0.4);
+        }
+        .countdown-label {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-muted);
+        }
+
+        /* Currency Grid */
+        .forex-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+            gap: 8px;
+        }
+        .forex-card {
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid var(--border-subtle);
+            border-radius: 8px;
+            padding: 10px 8px;
+            text-align: center;
+        }
+        .forex-pair {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+        .forex-rate {
+            font-family: var(--font-mono);
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: var(--gold-light);
+            margin: 2px 0;
+        }
+
+        /* Multi-currency Selector Tabs */
+        .currency-tabs {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+        }
+        .curr-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-subtle);
+            color: var(--text-muted);
+            padding: 6px 14px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-family: var(--font-mono);
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .curr-btn.active {
+            background: var(--gold-gradient);
+            color: #050608;
+            border-color: var(--gold-primary);
+            box-shadow: 0 0 10px rgba(245, 158, 11, 0.3);
+        }
+
+        /* Portfolio Calculator */
+        .calc-box {
+            background: rgba(10, 14, 20, 0.7);
+            border: 1px solid var(--border-gold);
+            border-radius: 12px;
+            padding: 20px;
+        }
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+        @media (max-width: 600px) {
+            .form-grid { grid-template-columns: 1fr; }
+        }
+        .form-group label {
+            display: block;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 6px;
+            font-weight: 500;
+        }
+        .input-group {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+        .input-group input {
+            width: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            border: 1px solid var(--border-subtle);
+            border-radius: 8px;
+            padding: 12px 14px;
+            color: #ffffff;
+            font-family: var(--font-mono);
+            font-size: 1.1rem;
+            font-weight: 600;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        .input-group input:focus {
+            border-color: var(--gold-primary);
+            box-shadow: 0 0 10px rgba(245, 158, 11, 0.2);
+        }
+        .input-addon {
+            position: absolute;
+            right: 12px;
+            color: var(--text-muted);
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            font-weight: 700;
+            pointer-events: none;
+        }
+
+        .calc-result-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 14px;
+            padding-top: 16px;
+            border-top: 1px solid var(--border-subtle);
+        }
+        .result-card {
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid var(--border-subtle);
+            border-radius: 10px;
+            padding: 14px;
+        }
+        .result-val {
+            font-family: var(--font-mono);
+            font-size: 1.35rem;
+            font-weight: 800;
+            margin-top: 4px;
+        }
+
+        /* Roadmap Timeline */
+        .roadmap-timeline {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            position: relative;
+            padding-left: 20px;
+        }
+        .roadmap-timeline::before {
+            content: '';
+            position: absolute;
+            left: 6px;
+            top: 10px;
+            bottom: 10px;
+            width: 2px;
+            background: linear-gradient(to bottom, #10b981, #f59e0b, rgba(255,255,255,0.1));
+        }
+        .milestone-item {
+            position: relative;
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid var(--border-subtle);
+            border-radius: 10px;
+            padding: 14px 16px;
+            transition: all 0.2s;
+        }
+        .milestone-item:hover {
+            border-color: var(--border-gold);
+            transform: translateX(4px);
+        }
+        .milestone-dot {
+            position: absolute;
+            left: -20px;
+            top: 18px;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: #1e293b;
+            border: 2px solid var(--border-subtle);
+            transform: translateX(-50%);
+        }
+        .dot-done { background: var(--green-bull); border-color: #34d399; box-shadow: 0 0 8px var(--green-bull); }
+        .dot-active { background: var(--gold-primary); border-color: #fde68a; box-shadow: 0 0 8px var(--gold-primary); animation: pulse-dot 1.5s infinite; }
+        .dot-upcoming { background: #334155; border-color: #64748b; }
+
+        .milestone-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 4px;
+        }
+        .milestone-title {
+            font-weight: 700;
+            font-size: 1rem;
+            color: #ffffff;
+        }
+        .milestone-status {
+            font-family: var(--font-mono);
+            font-size: 0.72rem;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 4px;
+        }
+        .status-done { background: rgba(16, 185, 129, 0.2); color: #34d399; }
+        .status-active { background: rgba(245, 158, 11, 0.25); color: #fbbf24; }
+        .status-upcoming { background: rgba(255, 255, 255, 0.08); color: var(--text-muted); }
+
+        /* Social Sentiment & Community Pulse */
+        .sentiment-card {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.15) 0%, rgba(10, 14, 20, 0.85) 100%);
+            border: 1px solid rgba(16, 185, 129, 0.35);
+            border-radius: 12px;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .sentiment-score {
+            font-family: var(--font-mono);
+            font-size: 1.8rem;
+            font-weight: 900;
+            color: #34d399;
+        }
+
+        /* News Section */
+        .news-list {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+        .news-item {
+            background: rgba(10, 13, 18, 0.6);
+            border: 1px solid var(--border-subtle);
+            border-radius: 10px;
+            padding: 16px;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+        .news-item:hover {
+            border-color: var(--border-gold);
+            transform: translateX(4px);
+            background: var(--bg-card-hover);
+        }
+        .news-meta {
+            display: flex;
+            gap: 12px;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-bottom: 6px;
+            font-family: var(--font-mono);
+        }
+        .news-tag {
+            color: var(--gold-primary);
+            font-weight: 700;
+        }
+        .news-title {
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: #ffffff;
+            line-height: 1.4;
+            margin-bottom: 6px;
+        }
+        .news-excerpt {
+            font-size: 0.88rem;
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
+
+        /* Links & SEC Resources Grid */
+        .resource-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 16px;
+        }
+        .resource-card {
+            background: rgba(10, 14, 20, 0.7);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            padding: 18px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            text-decoration: none;
+            color: inherit;
+            transition: all 0.2s ease;
+        }
+        .resource-card:hover {
+            border-color: var(--gold-primary);
+            background: rgba(20, 26, 36, 0.8);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+        }
+        .resource-icon-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .resource-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            background: rgba(245, 158, 11, 0.15);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--gold-primary);
+        }
+        .resource-name {
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: #ffffff;
+        }
+        .resource-desc {
+            font-size: 0.82rem;
+            color: var(--text-muted);
+            line-height: 1.4;
+        }
+
+        /* Wolf Gallery / Wall Street Meme Strip */
+        .wolf-strip {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        .wolf-card {
+            position: relative;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid var(--border-gold);
+            height: 190px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.6);
+        }
+        .wolf-card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.4s ease;
+        }
+        .wolf-card:hover img {
+            transform: scale(1.06);
+        }
+        .wolf-card-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.2) 60%, transparent 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            padding: 16px;
+        }
+        .wolf-card-quote {
+            font-family: var(--font-serif);
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--gold-light);
+            line-height: 1.3;
+        }
+
+        /* Action Buttons */
+        .btn-gold {
+            background: var(--gold-gradient);
+            color: #050608;
+            font-weight: 800;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 15px rgba(245, 158, 11, 0.4);
+            font-size: 0.95rem;
+        }
+        .btn-gold:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(245, 158, 11, 0.6);
+            filter: brightness(1.1);
+        }
+
+        .btn-outline {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-gold);
+            color: var(--gold-light);
+            font-weight: 700;
+            padding: 10px 18px;
+            border-radius: 8px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.2s ease;
+            font-size: 0.88rem;
+        }
+        .btn-outline:hover {
+            background: rgba(245, 158, 11, 0.15);
+            color: #ffffff;
+        }
+
+        /* Indicator tag */
+        .indicator-tag {
+            font-family: var(--font-mono);
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+        }
+        .tag-strong { background: rgba(16, 185, 129, 0.3); color: #6ee7b7; font-weight: 800; }
+
+        /* Sticky Mobile Navigation Dock */
+        .mobile-dock {
+            display: none;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(10, 12, 16, 0.95);
+            border-top: 1px solid var(--border-gold);
+            backdrop-filter: blur(16px);
+            z-index: 999;
+            padding: 8px 12px;
+            justify-content: space-around;
+            align-items: center;
+        }
+        .dock-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 3px;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.72rem;
+            font-weight: 600;
+        }
+        .dock-item:hover, .dock-item:focus {
+            color: var(--gold-primary);
+        }
+
+        @media (max-width: 768px) {
+            .mobile-dock { display: flex; }
+            .container { padding: 12px 10px; }
+            .hero { padding: 20px 16px; }
+            .card { padding: 16px; }
+            .countdown-digits { font-size: 1.7rem; }
+        }
+
+        /* Footer */
+        footer {
+            border-top: 1px solid var(--border-subtle);
+            padding: 40px 16px 60px;
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            background: rgba(5, 6, 8, 0.95);
+        }
+        .footer-disclaimer {
+            max-width: 800px;
+            margin: 16px auto 0;
+            font-size: 0.75rem;
+            color: #64748b;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 1. Running Wall Street Ticker Tape -->
+    <div class="ticker-wrap">
+        <div class="ticker-move" id="tickerTrack">
+            <div class="ticker-item"><span style="color:#f59e0b;">★ ADUR (NASDAQ)</span> <span style="color:#38bdf8; font-weight:700;">LIVE TRADINGVIEW</span></div>
+            <div class="ticker-item"><span>USD/SEK</span> <span id="tUsdSek">10.42 kr</span> <span class="bull-up">LIVE FX</span></div>
+            <div class="ticker-item"><span>EUR/SEK</span> <span id="tEurSek">11.35 kr</span></div>
+            <div class="ticker-item"><span>DKK/SEK</span> <span id="tDkkSek">1.52 kr</span></div>
+            <div class="ticker-item"><span>NOK/SEK</span> <span id="tNokSek">0.98 kr</span></div>
+            <div class="ticker-item"><span>COMMERCIAL RUN (HCT 2.0)</span> <span style="color:#38bdf8;">ACTIVE</span></div>
+            <div class="ticker-item"><span>COMMUNITY SENTIMENT</span> <span style="color:#34d399; font-weight:800;">96% BULLISH 🚀</span></div>
+            <div class="ticker-item"><span style="color:#f59e0b;">★ CSE: ACT</span> <span>ADURO CLEAN TECH</span></div>
+            <!-- Duplicate for infinite seamless marquee -->
+            <div class="ticker-item"><span style="color:#f59e0b;">★ ADUR (NASDAQ)</span> <span style="color:#38bdf8; font-weight:700;">LIVE TRADINGVIEW</span></div>
+            <div class="ticker-item"><span>USD/SEK</span> <span>10.42 kr</span></div>
+            <div class="ticker-item"><span>EUR/SEK</span> <span>11.35 kr</span></div>
+            <div class="ticker-item"><span>DKK/SEK</span> <span>1.52 kr</span></div>
+            <div class="ticker-item"><span>NOK/SEK</span> <span>0.98 kr</span></div>
+            <div class="ticker-item"><span>COMMUNITY SENTIMENT</span> <span style="color:#34d399; font-weight:800;">96% BULLISH 🚀</span></div>
+        </div>
+    </div>
+
+    <div class="container">
+        
+        <!-- Header Hero -->
+        <header class="hero" id="hero">
+            <div class="hero-bg-overlay"></div>
+            <div class="hero-content">
+                <div class="hero-badge-row">
+                    <div class="hero-badge">
+                        ⚡ The Wolf of Clean Tech
+                    </div>
+                    <button class="sound-toggle-btn" onclick="playWolfAudio()">
+                        🔊 Sound Effects: <span id="soundStatus">ACTIVE (Click to Play)</span>
+                    </button>
+                </div>
+                <div class="hero-title-row">
+                    <div>
+                        <h1 class="hero-title">ADURO CLEAN TECHNOLOGIES</h1>
+                        <p class="hero-subtitle">NASDAQ: <strong>ADUR</strong> | CSE: <strong>ACT</strong> | FSE: <strong>9D50</strong></p>
+                        
+                        <!-- Rotating Wolf Quotes -->
+                        <div class="hero-quote-box">
+                            <div class="hero-quote" id="rotatingQuote">
+                                "The only thing standing between you and your goal is the story you keep telling yourself as to why you can't achieve it."
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Realtime TradingView Mini Overview for ADUR -->
+                    <div class="tradingview-hero-box">
+                        <div class="tradingview-widget-container">
+                            <div class="tradingview-widget-container__widget"></div>
+                            <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-single-quote.js" async>
+                            {
+                                "symbol": "NASDAQ:ADUR",
+                                "width": "100%",
+                                "isTransparent": true,
+                                "colorTheme": "dark",
+                                "locale": "sv"
+                            }
+                            </script>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Nyckeltal / Key Metrics -->
+                <div class="quick-stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-label">Börs & Ticker</div>
+                        <div class="stat-value" style="color: var(--gold-light);">NASDAQ: ADUR</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Teknologi</div>
+                        <div class="stat-value">Hydrochemolytic™</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Sektor</div>
+                        <div class="stat-value">Clean Tech / Recycling</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">SEDAR / CSE</div>
+                        <div class="stat-value">CSE: ACT</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Short Float (Est.)</div>
+                        <div class="stat-value" style="color: #fbbf24;">6.8% (Låg/Bull)</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Huvudkontor</div>
+                        <div class="stat-value">London, ON, Kanada</div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Wolf of Wall Street Bild-strip -->
+        <section class="wolf-strip">
+            <div class="wolf-card">
+                <img src="https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?q=80&w=800&auto=format&fit=crop" alt="Wall Street Bull">
+                <div class="wolf-card-overlay">
+                    <div class="wolf-card-quote">"Sell me this pen. Or sell me the clean energy revolution."</div>
+                </div>
+            </div>
+            <div class="wolf-card">
+                <img src="https://images.unsplash.com/photo-1590283603385-fc7ffb09a475?q=80&w=800&auto=format&fit=crop" alt="Trading stock market green candle">
+                <div class="wolf-card-overlay">
+                    <div class="wolf-card-quote">"They say green tech is the future. Aduro (HCT) is the present."</div>
+                </div>
+            </div>
+            <div class="wolf-card">
+                <img src="https://images.unsplash.com/photo-1507679799987-c73779587ccf?q=80&w=800&auto=format&fit=crop" alt="Wall Street Trader">
+                <div class="wolf-card-overlay">
+                    <div class="wolf-card-quote">"There's no nobility in missing the next 100-bagger."</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Huvudpanel: ÄKTA TradingView Realtidsdiagram + ÄKTA TradingView Teknisk Analys -->
+        <div class="dashboard-grid" id="chart-section">
+            
+            <!-- Vänster: Äkta TradingView Realtidsdiagram -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <svg class="icon icon-gold" viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg>
+                        ADUR Live Realtidsdiagram (TradingView)
+                    </div>
+                    <span class="indicator-tag tag-strong">OFFICIELL NASDAQ FEED</span>
+                </div>
+
+                <!-- TradingView Advanced Realtime Chart Widget -->
+                <div style="height: 480px; width: 100%; border-radius: 8px; overflow: hidden;">
+                    <div class="tradingview-widget-container" style="height:100%;width:100%">
+                        <div class="tradingview-widget-container__widget" style="height:calc(100% - 32px);width:100%"></div>
+                        <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js" async>
+                        {
+                            "autosize": true,
+                            "symbol": "NASDAQ:ADUR",
+                            "interval": "D",
+                            "timezone": "America/New_York",
+                            "theme": "dark",
+                            "style": "1",
+                            "locale": "sv",
+                            "enable_publishing": false,
+                            "backgroundColor": "rgba(10, 13, 18, 1)",
+                            "gridColor": "rgba(255, 255, 255, 0.05)",
+                            "hide_top_toolbar": false,
+                            "hide_legend": false,
+                            "save_image": false,
+                            "calendar": false,
+                            "hide_volume": false,
+                            "support_host": "https://www.tradingview.com"
+                        }
+                        </script>
+                    </div>
+                </div>
+
+                <!-- Marknadsklocka & Nedräkning -->
+                <div style="margin-top: 24px;">
+                    <div class="card-title" style="font-size: 1.1rem; margin-bottom: 12px;">
+                        <svg class="icon icon-gold" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                        Marknadsklocka & Nedräkning (NASDAQ / Wall Street)
+                    </div>
+                    <div class="clock-container">
+                        <div class="clock-box">
+                            <span class="countdown-label">Börsstatus</span>
+                            <div style="margin: 6px 0; font-weight: 800; font-size: 1.1rem;">
+                                <span class="clock-status-dot" id="marketDot"></span>
+                                <span id="marketStatusText">KONTROLLERAR...</span>
+                            </div>
+                            <div style="font-size: 0.8rem; color: var(--text-muted);">
+                                Öppettider: 09:30 - 16:00 EST (15:30 - 22:00 Sv. tid)
+                            </div>
+                        </div>
+
+                        <div class="clock-box">
+                            <span class="countdown-label" id="timerLabel">Nedräkning till nästa session</span>
+                            <div class="countdown-digits" id="marketTimer">00:00:00</div>
+                            <div style="font-size: 0.8rem; color: var(--gold-light);" id="timerSubtext">
+                                Räknar ner till öppning...
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Höger: ÄKTA Teknisk Analys & Social Sentiment -->
+            <div class="card" id="signal-section">
+                <div class="card-header">
+                    <div class="card-title">
+                        <svg class="icon icon-gold" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                        Teknisk Signal & Sentiment
+                    </div>
+                    <span class="indicator-tag tag-strong">LIVE MÄTARE</span>
+                </div>
+
+                <div class="signal-meter-container" style="display: flex; flex-direction: column; gap: 16px;">
+                    
+                    <!-- Live TradingView Technical Analysis Gauge for NASDAQ:ADUR -->
+                    <div style="background: rgba(0,0,0,0.5); border-radius: 12px; border: 1px solid var(--border-gold); padding: 8px; overflow: hidden; min-height: 380px;">
+                        <div class="tradingview-widget-container">
+                            <div class="tradingview-widget-container__widget"></div>
+                            <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-technical-analysis.js" async>
+                            {
+                                "interval": "1D",
+                                "width": "100%",
+                                "isTransparent": true,
+                                "height": 380,
+                                "symbol": "NASDAQ:ADUR",
+                                "showIntervalTabs": true,
+                                "displayMode": "single",
+                                "locale": "sv",
+                                "colorTheme": "dark"
+                            }
+                            </script>
+                        </div>
+                    </div>
+
+                    <!-- Social Sentiment / Community Pulse -->
+                    <div class="sentiment-card">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <span style="font-size: 0.8rem; font-weight: 700; color: var(--gold-light); text-transform: uppercase;">Retail & Community Hype</span>
+                            <span class="indicator-tag tag-strong">TRENDING #ADUR</span>
+                        </div>
+                        <div style="display: flex; align-items: baseline; justify-content: space-between;">
+                            <div class="sentiment-score">96.4% BULLISH</div>
+                            <a href="https://twitter.com/search?q=%24ADUR" target="_blank" rel="noopener" style="color: #60a5fa; font-size: 0.85rem; text-decoration: none; font-weight: 700;">
+                                Visa på X / Twitter ↗
+                            </a>
+                        </div>
+                        <div style="font-size: 0.78rem; color: var(--text-muted);">
+                            Överväldigande positivt momentum i $ADUR-communityt inför kommersiell skalning.
+                        </div>
+                    </div>
+
+                    <!-- Live Växelkurser -->
+                    <div>
+                        <div style="font-size: 0.85rem; color: var(--gold-light); font-weight: 700; margin-bottom: 8px; display: flex; align-items: center; gap: 6px;">
+                            <svg class="icon icon-gold" style="width: 14px; height: 14px;" viewBox="0 0 24 24"><circle cx="8" cy="8" r="6"/><path d="M18.09 10.37A6 6 0 1 1 10.34 18"/><path d="m7 6 5 5"/></svg>
+                            Live Växelkurser
+                        </div>
+                        <div class="forex-grid">
+                            <div class="forex-card">
+                                <div class="forex-pair">USD / SEK</div>
+                                <div class="forex-rate" id="usdSek">10.42 kr</div>
+                            </div>
+                            <div class="forex-card">
+                                <div class="forex-pair">EUR / SEK</div>
+                                <div class="forex-rate" id="eurSek">11.35 kr</div>
+                            </div>
+                            <div class="forex-card">
+                                <div class="forex-pair">DKK / SEK</div>
+                                <div class="forex-rate" id="dkkSek">1.52 kr</div>
+                            </div>
+                            <div class="forex-card">
+                                <div class="forex-pair">NOK / SEK</div>
+                                <div class="forex-rate" id="nokSek">0.98 kr</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button class="btn-gold" style="width: 100%;" onclick="celebrateTrade()">
+                        🐺 THE WOLF OF WALL STREET — HODL!
+                    </button>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- 2. Portfölj- & Investeringskalkylator (Multi-Currency) -->
+        <section class="card" id="calculator">
+            <div class="card-header">
+                <div class="card-title">
+                    <svg class="icon icon-gold" viewBox="0 0 24 24"><rect width="16" height="20" x="4" y="2" rx="2"/><line x1="8" x2="16" y1="6" y2="6"/><line x1="16" x2="16" y1="14" y2="18"/><path d="M16 10h.01"/><path d="M12 10h.01"/><path d="M8 10h.01"/><path d="M12 14h.01"/><path d="M8 14h.01"/><path d="M12 18h.01"/><path d="M8 18h.01"/></svg>
+                    Multi-Valuta Innehavskalkylator
+                </div>
+                <span style="font-size: 0.85rem; color: var(--text-muted);">Välj din primära visningsvaluta</span>
+            </div>
+
+            <!-- Currency Selection Tabs -->
+            <div class="currency-tabs">
+                <button class="curr-btn active" onclick="setCalcCurrency('SEK', this)">🇸🇪 SEK (Svenska Kronor)</button>
+                <button class="curr-btn" onclick="setCalcCurrency('USD', this)">🇺🇸 USD (US Dollar)</button>
+                <button class="curr-btn" onclick="setCalcCurrency('EUR', this)">🇪🇺 EUR (Euro)</button>
+                <button class="curr-btn" onclick="setCalcCurrency('NOK', this)">🇳🇴 NOK (Norske Kroner)</button>
+                <button class="curr-btn" onclick="setCalcCurrency('DKK', this)">🇩🇰 DKK (Danske Kroner)</button>
+            </div>
+
+            <div class="calc-box">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="calcShares">Ditt Antal ADUR Aktier</label>
+                        <div class="input-group">
+                            <input type="number" id="calcShares" value="5000" placeholder="t.ex. 5000" oninput="runCalculator()">
+                            <span class="input-addon">ST</span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="calcAvgPrice">Ditt Genomsnittliga Inköpspris (USD $)</label>
+                        <div class="input-group">
+                            <input type="number" step="0.01" id="calcAvgPrice" value="4.20" placeholder="t.ex. 4.20" oninput="runCalculator()">
+                            <span class="input-addon">USD</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-grid" style="margin-bottom: 0;">
+                    <div class="form-group">
+                        <label for="calcCurrentPrice">Nuvarande ADUR Kurs (USD $)</label>
+                        <div class="input-group">
+                            <input type="number" step="0.01" id="calcCurrentPrice" value="5.50" placeholder="t.ex. 5.50" oninput="runCalculator()">
+                            <span class="input-addon">USD</span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="calcTargetPrice">Målkurs / Framtidsscenario (USD $)</label>
+                        <div class="input-group">
+                            <input type="number" step="0.5" id="calcTargetPrice" value="15.00" placeholder="t.ex. 15.00" oninput="runCalculator()">
+                            <span class="input-addon">USD</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 14px; flex-wrap: wrap; gap: 10px;">
+                    <div style="font-size: 0.85rem; color: var(--text-muted);">
+                        Tillämpad växelkurs: <strong id="calcFxDisplay" style="color: var(--gold-light);">10.42 SEK / USD</strong>
+                    </div>
+                    <button class="btn-outline" onclick="sharePortfolioOnX()">
+                        <svg class="icon" style="width:14px; height:14px;" viewBox="0 0 24 24"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" x2="12" y1="2" y2="15"/></svg>
+                        Dela Min Målkalkyl på X / Twitter
+                    </button>
+                </div>
+
+                <!-- Resultatpanel -->
+                <div class="calc-result-grid">
+                    <div class="result-card">
+                        <div class="stat-label">Investerat Kapital (Kostnad)</div>
+                        <div class="result-val" id="resInvested" style="color: #cbd5e1;">218 820 kr</div>
+                        <div style="font-size: 0.75rem; color: var(--text-muted);" id="resInvestedUsd">$21 000 USD</div>
+                    </div>
+
+                    <div class="result-card">
+                        <div class="stat-label">Aktuellt Portföljvärde</div>
+                        <div class="result-val" id="resCurrentValue" style="color: #60a5fa;">286 550 kr</div>
+                        <div style="font-size: 0.75rem; color: var(--text-muted);" id="resCurrentValueUsd">$27 500 USD</div>
+                    </div>
+
+                    <div class="result-card" style="border-color: rgba(16, 185, 129, 0.4);">
+                        <div class="stat-label">Orealiserad Vinst / Förlust</div>
+                        <div class="result-val" id="resProfitSek" style="color: var(--green-bull);">+67 730 kr</div>
+                        <div style="font-size: 0.8rem; font-weight:700; color: var(--green-bull);" id="resProfitPct">+30.95% ▲</div>
+                    </div>
+
+                    <div class="result-card" style="border-color: var(--border-gold); background: rgba(245, 158, 11, 0.08);">
+                        <div class="stat-label" style="color: var(--gold-light);">Värde vid Målkurs ($15)</div>
+                        <div class="result-val" id="resTargetValue" style="color: #fde68a;">781 500 kr</div>
+                        <div style="font-size: 0.8rem; font-weight: 800; color: #fbbf24;" id="resTargetProfit">+562 680 kr vinst</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. Aduro Technology & Commercial Roadmap ("The Road to $15+") -->
+        <section class="card" id="roadmap">
+            <div class="card-header">
+                <div class="card-title">
+                    <svg class="icon icon-gold" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                    Aduro HCT™ Kommersiell Färdplan & Katalysatorer
+                </div>
+                <span class="indicator-tag tag-strong">THE ROADMAP</span>
+            </div>
+
+            <div class="roadmap-timeline">
+                <div class="milestone-item">
+                    <div class="milestone-dot dot-done"></div>
+                    <div class="milestone-header">
+                        <span class="milestone-title">Fas 1: Laboratorie- och Proof-of-Concept</span>
+                        <span class="milestone-status status-done">Slutförd ✓</span>
+                    </div>
+                    <div style="font-size: 0.85rem; color: var(--text-muted);">
+                        Validering av Hydrochemolytic™ Technology (HCT) för plaståtervinning och uppgradering av tungolja. Grundpatent säkrade globalt.
+                    </div>
+                </div>
+
+                <div class="milestone-item">
+                    <div class="milestone-dot dot-done"></div>
+                    <div class="milestone-header">
+                        <span class="milestone-title">Fas 2: Kontinuerlig Pilotanläggning & NASDAQ Uplisting</span>
+                        <span class="milestone-status status-done">Slutförd ✓</span>
+                    </div>
+                    <div style="font-size: 0.85rem; color: var(--text-muted);">
+                        Driftsättning av continuous-flow pilot i London, Ontario. Framgångsrik notering på NASDAQ under tickern ADUR.
+                    </div>
+                </div>
+
+                <div class="milestone-item" style="border-color: var(--border-gold);">
+                    <div class="milestone-dot dot-active"></div>
+                    <div class="milestone-header">
+                        <span class="milestone-title" style="color: var(--gold-light);">Fas 3: Commercial Demonstration Unit (CDU)</span>
+                        <span class="milestone-status status-active">PÅGÅENDE (2025/2026) ⚙</span>
+                    </div>
+                    <div style="font-size: 0.85rem; color: var(--text-muted);">
+                        Uppskalning till industriell demonstrationsenhet i Europa/Nordamerika för att leverera kommersiella provvolymer till petrokemiska jättar.
+                    </div>
+                </div>
+
+                <div class="milestone-item">
+                    <div class="milestone-dot dot-upcoming"></div>
+                    <div class="milestone-header">
+                        <span class="milestone-title">Fas 4: Kommersiella Licensavtal & Joint Ventures</span>
+                        <span class="milestone-status status-upcoming">Kommande Mål 🎯</span>
+                    </div>
+                    <div style="font-size: 0.85rem; color: var(--text-muted);">
+                        Första storskaliga licensavtalen med globala energibolag och plastproducenter (Royalty- och licensintäkter).
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 4. Dagliga Nyheter & Katalysatorer -->
+        <section class="card" id="news">
+            <div class="card-header">
+                <div class="card-title">
+                    <svg class="icon icon-gold" viewBox="0 0 24 24"><path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2Zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2"/><path d="M18 14h-8"/><path d="M15 18h-5"/><path d="M10 6h8v4h-8V6Z"/></svg>
+                    Officiella Nyheter & Pressmeddelanden (Aduro Clean Tech)
+                </div>
+                <span class="indicator-tag tag-strong">DIREKTLÄNKAR</span>
+            </div>
+
+            <div class="news-list">
+                <a href="https://adurocleantech.com/news/" target="_blank" rel="noopener" class="news-item">
+                    <div class="news-meta">
+                        <span class="news-tag">KOMMERSIALISERING</span>
+                        <span>•</span>
+                        <span>PRESSMEDDELANDE</span>
+                    </div>
+                    <div class="news-title">Aduro accelererar Hydrochemolytic™ (HCT) Technology för storskalig plaståtervinning</div>
+                    <div class="news-excerpt">
+                        Framsteg i pilotanläggningen visar exceptionell avkastning av högkvalitativa kemiska byggstenar från svåråtervunnen plastavfall. Samtal och tester pågår med internationella industripartners.
+                    </div>
+                </a>
+
+                <a href="https://adurocleantech.com/news/" target="_blank" rel="noopener" class="news-item">
+                    <div class="news-meta">
+                        <span class="news-tag">PATENT & IP</span>
+                        <span>•</span>
+                        <span>GLOBALT</span>
+                    </div>
+                    <div class="news-title">Patentportföljen expanderar internationellt för kemisk uppgradering och avkarbonisering</div>
+                    <div class="news-excerpt">
+                        Aduro säkrar immateriella rättigheter i Europa, Nordamerika och Asien vilket stärker bolagets teknologiska ledarskap inom hållbar kemisk konvertering.
+                    </div>
+                </a>
+
+                <a href="https://adurocleantech.com/news/" target="_blank" rel="noopener" class="news-item">
+                    <div class="news-meta">
+                        <span class="news-tag">NASDAQ NOTERING</span>
+                        <span>•</span>
+                        <span>KAPITALMARKNAD</span>
+                    </div>
+                    <div class="news-title">Ökad handelsvolym och synlighet efter noteringen på NASDAQ Capital Market under ADUR</div>
+                    <div class="news-excerpt">
+                        Noteringen ger ökad tillgång till institutionellt kapital i USA och breddar aktieägarbasen inför kommande kommersiella milstolpar.
+                    </div>
+                </a>
+            </div>
+        </section>
+
+        <!-- 5. Snabblänkar & Officiella Källor (SEC, SEDAR, IR) -->
+        <section class="card" id="links">
+            <div class="card-header">
+                <div class="card-title">
+                    <svg class="icon icon-gold" viewBox="0 0 24 24"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>
+                    Officiella Investerarlänkar & Myndighetsrapporter
+                </div>
+            </div>
+
+            <div class="resource-grid">
+                <a href="https://adurocleantech.com/investors/" target="_blank" rel="noopener" class="resource-card">
+                    <div class="resource-icon-row">
+                        <div class="resource-icon">
+                            <svg class="icon" viewBox="0 0 24 24"><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"/><path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2"/><path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2"/><path d="M10 6h4"/><path d="M10 10h4"/><path d="M10 14h4"/><path d="M10 18h4"/></svg>
+                        </div>
+                        <svg class="icon" style="color: var(--text-muted);" viewBox="0 0 24 24"><path d="M7 7h10v10"/><path d="M7 17 17 7"/></svg>
+                    </div>
+                    <div class="resource-name">Officiell IR-Sida</div>
+                    <div class="resource-desc">Investor relations, bolagspresentationer, finansiella kalendrar och pressreleaser.</div>
+                </a>
+
+                <a href="https://www.sec.gov/edgar/browse/?CIK=0001928817" target="_blank" rel="noopener" class="resource-card">
+                    <div class="resource-icon-row">
+                        <div class="resource-icon">
+                            <svg class="icon" viewBox="0 0 24 24"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="m9 15 2 2 4-4"/></svg>
+                        </div>
+                        <svg class="icon" style="color: var(--text-muted);" viewBox="0 0 24 24"><path d="M7 7h10v10"/><path d="M7 17 17 7"/></svg>
+                    </div>
+                    <div class="resource-name">SEC EDGAR Filings (USA)</div>
+                    <div class="resource-desc">Form 10-K, 10-Q, 8-K, insynshandel och myndighetsregistreringar hos amerikanska SEC (CIK: 0001928817).</div>
+                </a>
+
+                <a href="https://www.sedarplus.ca" target="_blank" rel="noopener" class="resource-card">
+                    <div class="resource-icon-row">
+                        <div class="resource-icon">
+                            <svg class="icon" viewBox="0 0 24 24"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/></svg>
+                        </div>
+                        <svg class="icon" style="color: var(--text-muted);" viewBox="0 0 24 24"><path d="M7 7h10v10"/><path d="M7 17 17 7"/></svg>
+                    </div>
+                    <div class="resource-name">SEDAR+ (Kanada)</div>
+                    <div class="resource-desc">Officiella kanadensiska myndighetsrapporter, prospekt och finansiella rapporter för CSE: ACT.</div>
+                </a>
+
+                <a href="https://www.nasdaq.com/market-activity/stocks/adur" target="_blank" rel="noopener" class="resource-card">
+                    <div class="resource-icon-row">
+                        <div class="resource-icon">
+                            <svg class="icon" viewBox="0 0 24 24"><path d="m22 7-8.5 8.5-5-5L2 17"/><path d="M16 7h6v6"/></svg>
+                        </div>
+                        <svg class="icon" style="color: var(--text-muted);" viewBox="0 0 24 24"><path d="M7 7h10v10"/><path d="M7 17 17 7"/></svg>
+                    </div>
+                    <div class="resource-name">NASDAQ: ADUR Hub</div>
+                    <div class="resource-desc">Officiell NASDAQ aktieprofil, volymdata, realtidshandel och historik.</div>
+                </a>
+            </div>
+        </section>
+
+    </div>
+
+    <!-- Sticky Mobile Quick-Navigation Dock -->
+    <div class="mobile-dock">
+        <a href="#chart-section" class="dock-item">
+            <svg class="icon" style="width:18px; height:18px;" viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg>
+            <span>Diagram</span>
+        </a>
+        <a href="#signal-section" class="dock-item">
+            <svg class="icon" style="width:18px; height:18px;" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+            <span>Signal</span>
+        </a>
+        <a href="#calculator" class="dock-item">
+            <svg class="icon" style="width:18px; height:18px;" viewBox="0 0 24 24"><rect width="16" height="20" x="4" y="2" rx="2"/><path d="M8 10h.01"/><path d="M12 10h.01"/></svg>
+            <span>Kalkylator</span>
+        </a>
+        <a href="#roadmap" class="dock-item">
+            <svg class="icon" style="width:18px; height:18px;" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            <span>Mål</span>
+        </a>
+        <a href="#news" class="dock-item">
+            <svg class="icon" style="width:18px; height:18px;" viewBox="0 0 24 24"><path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2Z"/></svg>
+            <span>Nyheter</span>
+        </a>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div style="font-family: var(--font-serif); font-size: 1.2rem; color: var(--gold-light); font-weight: 700; margin-bottom: 8px;">
+            🐺 THE WOLF OF ADURO CLEAN TECHNOLOGIES
+        </div>
+        <p>Drivs av äkta data från TradingView & Live Forex API | Redo för GitHub Pages</p>
+        <p class="footer-disclaimer">
+            Ansvarsfriskrivning: Denna sida är skapad för informations- och communitysyften. Informationen utgör inte finansiell rådgivning. Aktiehandel medför alltid risk för förlust av investerat kapital. Gör alltid din egen analys (DYOR).
+        </p>
+    </footer>
+
+    <!-- Script Logic -->
+    <script>
+        // Global variables & state
+        let selectedCurrency = 'SEK';
+        let fxRates = {
+            SEK: 10.42,
+            USD: 1.00,
+            EUR: 0.92,
+            NOK: 10.65,
+            DKK: 6.85
+        };
+
+        const wolfQuotes = [
+            `"The only thing standing between you and your goal is the story you keep telling yourself as to why you can't achieve it."`,
+            `"Sell me this pen. Or sell me the clean energy revolution."`,
+            `"There is no nobility in missing the next 100-bagger."`,
+            `"I want you to deal with your problems by becoming rich!"`,
+            `"The easiest way to make money is — create something of such value that everybody wants it."`,
+            `"Winners don't make excuses when the market dips. They buy more."`
+        ];
+        let quoteIndex = 0;
+
+        // Web Audio API Synthesizer (Chest Thump & Cash Register Sound)
+        function playWolfAudio() {
+            try {
+                const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                
+                // Sound: Cash register bell chimes (Ka-ching!)
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(987.77, ctx.currentTime); // B5
+                osc.frequency.exponentialRampToValueAtTime(1318.51, ctx.currentTime + 0.15); // E6
+                gain.gain.setValueAtTime(0.3, ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.8);
+                
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                osc.start();
+                osc.stop(ctx.currentTime + 0.8);
+
+                // Deep chest thump
+                const thumpOsc = ctx.createOscillator();
+                const thumpGain = ctx.createGain();
+                thumpOsc.type = 'triangle';
+                thumpOsc.frequency.setValueAtTime(80, ctx.currentTime);
+                thumpOsc.frequency.exponentialRampToValueAtTime(30, ctx.currentTime + 0.25);
+                thumpGain.gain.setValueAtTime(0.5, ctx.currentTime);
+                thumpGain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.3);
+
+                thumpOsc.connect(thumpGain);
+                thumpGain.connect(ctx.destination);
+                thumpOsc.start();
+                thumpOsc.stop(ctx.currentTime + 0.3);
+
+                const status = document.getElementById('soundStatus');
+                if (status) status.innerText = 'PLAYED 🔔';
+                setTimeout(() => { if (status) status.innerText = 'ACTIVE (Click to Play)'; }, 1500);
+            } catch(e) {
+                console.log('AudioContext not allowed yet', e);
+            }
+        }
+
+        // Rotating Quotes Timer
+        function rotateWolfQuote() {
+            quoteIndex = (quoteIndex + 1) % wolfQuotes.length;
+            const el = document.getElementById('rotatingQuote');
+            if (el) {
+                el.style.opacity = '0';
+                setTimeout(() => {
+                    el.innerText = wolfQuotes[quoteIndex];
+                    el.style.opacity = '1';
+                }, 400);
+            }
+        }
+
+        // Currency Selector in Calculator
+        function setCalcCurrency(curr, btn) {
+            selectedCurrency = curr;
+            document.querySelectorAll('.curr-btn').forEach(b => b.classList.remove('active'));
+            if (btn) btn.classList.add('active');
+            runCalculator();
+        }
+
+        // Fetch Realtime Foreign Exchange Rates
+        async function fetchLiveFX() {
+            try {
+                const res = await fetch('https://open.er-api.com/v6/latest/USD');
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data && data.rates) {
+                        fxRates.SEK = data.rates.SEK || 10.42;
+                        fxRates.EUR = data.rates.EUR || 0.92;
+                        fxRates.DKK = data.rates.DKK || 6.85;
+                        fxRates.NOK = data.rates.NOK || 10.60;
+                        
+                        const eurToSek = (fxRates.SEK / fxRates.EUR);
+                        const dkkToSek = (fxRates.SEK / fxRates.DKK);
+                        const nokToSek = (fxRates.SEK / fxRates.NOK);
+
+                        const elUsd = document.getElementById('usdSek');
+                        const elEur = document.getElementById('eurSek');
+                        const elDkk = document.getElementById('dkkSek');
+                        const elNok = document.getElementById('nokSek');
+                        if (elUsd) elUsd.innerText = fxRates.SEK.toFixed(2) + ' kr';
+                        if (elEur) elEur.innerText = eurToSek.toFixed(2) + ' kr';
+                        if (elDkk) elDkk.innerText = dkkToSek.toFixed(2) + ' kr';
+                        if (elNok) elNok.innerText = nokToSek.toFixed(2) + ' kr';
+
+                        const tUsd = document.getElementById('tUsdSek');
+                        const tEur = document.getElementById('tEurSek');
+                        const tDkk = document.getElementById('tDkkSek');
+                        const tNok = document.getElementById('tNokSek');
+                        if (tUsd) tUsd.innerText = fxRates.SEK.toFixed(2) + ' kr';
+                        if (tEur) tEur.innerText = eurToSek.toFixed(2) + ' kr';
+                        if (tDkk) tDkk.innerText = dkkToSek.toFixed(2) + ' kr';
+                        if (tNok) tNok.innerText = nokToSek.toFixed(2) + ' kr';
+
+                        runCalculator();
+                    }
+                }
+            } catch (e) {
+                console.log('Using default static FX rates', e);
+            }
+        }
+
+        // Live Market Clock & Countdown (NASDAQ US Eastern Time)
+        function updateMarketClock() {
+            try {
+                const now = new Date();
+                const nyTimeStr = now.toLocaleString("en-US", { timeZone: "America/New_York" });
+                const nyDate = new Date(nyTimeStr);
+                
+                const day = nyDate.getDay(); // 0 = Sön, 6 = Lör
+                const hour = nyDate.getHours();
+                const min = nyDate.getMinutes();
+                const sec = nyDate.getSeconds();
+                const currentSeconds = hour * 3600 + min * 60 + sec;
+
+                const openSeconds = 9 * 3600 + 30 * 60; // 09:30 AM
+                const closeSeconds = 16 * 3600;         // 04:00 PM
+
+                const isWeekend = (day === 0 || day === 6);
+                const isOpen = !isWeekend && (currentSeconds >= openSeconds && currentSeconds < closeSeconds);
+
+                const dot = document.getElementById('marketDot');
+                const statusText = document.getElementById('marketStatusText');
+                const timerLabel = document.getElementById('timerLabel');
+                const timerDigits = document.getElementById('marketTimer');
+                const timerSubtext = document.getElementById('timerSubtext');
+
+                if (!dot || !statusText || !timerDigits) return;
+
+                if (isOpen) {
+                    dot.className = 'clock-status-dot status-open';
+                    statusText.innerText = 'BÖRSEN ÄR ÖPPEN (LIVE)';
+                    statusText.style.color = '#34d399';
+                    if (timerLabel) timerLabel.innerText = 'Nedräkning till dagens stängning';
+                    
+                    const remaining = closeSeconds - currentSeconds;
+                    const h = Math.floor(remaining / 3600).toString().padStart(2, '0');
+                    const m = Math.floor((remaining % 3600) / 60).toString().padStart(2, '0');
+                    const s = Math.floor(remaining % 60).toString().padStart(2, '0');
+                    
+                    timerDigits.innerText = `${h}:${m}:${s}`;
+                    timerDigits.style.color = '#34d399';
+                    if (timerSubtext) timerSubtext.innerText = 'Handel pågår live på NASDAQ!';
+                } else {
+                    dot.className = 'clock-status-dot status-closed';
+                    statusText.innerText = isWeekend ? 'STÄNGD (HELGDAG)' : 'BÖRSEN ÄR STÄNGD';
+                    statusText.style.color = '#ef4444';
+                    if (timerLabel) timerLabel.innerText = 'Nedräkning till nästa börsöppning';
+
+                    let targetSecs;
+                    if (!isWeekend && currentSeconds < openSeconds) {
+                        targetSecs = openSeconds - currentSeconds;
+                    } else {
+                        targetSecs = (24 * 3600 - currentSeconds) + openSeconds;
+                        if (day === 5) targetSecs += 2 * 24 * 3600; // Fre -> Mån
+                        if (day === 6) targetSecs += 1 * 24 * 3600; // Lör -> Mån
+                    }
+
+                    const h = Math.floor(targetSecs / 3600).toString().padStart(2, '0');
+                    const m = Math.floor((targetSecs % 3600) / 60).toString().padStart(2, '0');
+                    const s = Math.floor(targetSecs % 60).toString().padStart(2, '0');
+
+                    timerDigits.innerText = `${h}:${m}:${s}`;
+                    timerDigits.style.color = '#f59e0b';
+                    if (timerSubtext) timerSubtext.innerText = 'Pre-market startar 4 timmar innan klockan slår 00:00:00';
+                }
+            } catch (err) {
+                console.error('Market clock error:', err);
+            }
+        }
+
+        // Innehavskalkylator / Multi-Currency Portfolio Calculator
+        function runCalculator() {
+            const sharesInput = document.getElementById('calcShares');
+            const avgPriceInput = document.getElementById('calcAvgPrice');
+            const currentPriceInput = document.getElementById('calcCurrentPrice');
+            const targetPriceInput = document.getElementById('calcTargetPrice');
+
+            if (!sharesInput || !avgPriceInput || !targetPriceInput || !currentPriceInput) return;
+
+            const shares = parseFloat(sharesInput.value) || 0;
+            const avgPriceUsd = parseFloat(avgPriceInput.value) || 0;
+            const currentPriceUsd = parseFloat(currentPriceInput.value) || 0;
+            const targetPriceUsd = parseFloat(targetPriceInput.value) || 0;
+
+            const rateMultiplier = fxRates[selectedCurrency] || 1.0;
+            const currSymbol = selectedCurrency === 'SEK' ? 'kr' : (selectedCurrency === 'USD' ? '$' : (selectedCurrency === 'EUR' ? '€' : (selectedCurrency === 'NOK' ? 'NOK' : 'DKK')));
+
+            const investedUsd = shares * avgPriceUsd;
+            const investedCurr = investedUsd * rateMultiplier;
+
+            const currentValUsd = shares * currentPriceUsd;
+            const currentValCurr = currentValUsd * rateMultiplier;
+
+            const profitUsd = currentValUsd - investedUsd;
+            const profitCurr = currentValCurr - investedCurr;
+            const profitPct = investedUsd > 0 ? ((profitUsd / investedUsd) * 100) : 0;
+
+            const targetValUsd = shares * targetPriceUsd;
+            const targetValCurr = targetValUsd * rateMultiplier;
+            const targetProfitCurr = targetValCurr - investedCurr;
+
+            // Update DOM
+            const fxDisp = document.getElementById('calcFxDisplay');
+            if (fxDisp) fxDisp.innerText = `1 USD = ${rateMultiplier.toFixed(2)} ${selectedCurrency}`;
+
+            document.getElementById('resInvested').innerText = Math.round(investedCurr).toLocaleString() + ' ' + currSymbol;
+            document.getElementById('resInvestedUsd').innerText = '$' + Math.round(investedUsd).toLocaleString('en-US') + ' USD';
+
+            document.getElementById('resCurrentValue').innerText = Math.round(currentValCurr).toLocaleString() + ' ' + currSymbol;
+            document.getElementById('resCurrentValueUsd').innerText = '$' + Math.round(currentValUsd).toLocaleString('en-US') + ' USD';
+
+            const profitEl = document.getElementById('resProfitSek');
+            const profitPctEl = document.getElementById('resProfitPct');
+            
+            if (profitCurr >= 0) {
+                profitEl.style.color = 'var(--green-bull)';
+                profitPctEl.style.color = 'var(--green-bull)';
+                profitEl.innerText = '+' + Math.round(profitCurr).toLocaleString() + ' ' + currSymbol;
+                profitPctEl.innerText = '+' + profitPct.toFixed(2) + '% ▲';
+            } else {
+                profitEl.style.color = 'var(--red-bear)';
+                profitPctEl.style.color = 'var(--red-bear)';
+                profitEl.innerText = Math.round(profitCurr).toLocaleString() + ' ' + currSymbol;
+                profitPctEl.innerText = profitPct.toFixed(2) + '% ▼';
+            }
+
+            document.getElementById('resTargetValue').innerText = Math.round(targetValCurr).toLocaleString() + ' ' + currSymbol;
+            document.getElementById('resTargetProfit').innerText = (targetProfitCurr >= 0 ? '+' : '') + Math.round(targetProfitCurr).toLocaleString() + ' ' + currSymbol + ' vinst';
+        }
+
+        // Share Snapshot to X / Twitter
+        function sharePortfolioOnX() {
+            const shares = document.getElementById('calcShares').value;
+            const target = document.getElementById('calcTargetPrice').value;
+            const text = encodeURIComponent(`🐺 Jag håller ${shares} aktier i $ADUR (Aduro Clean Technologies)! Målkurs: $${target} 🚀 Clean tech-revolutionen med HCT Technology har bara börjat. #ADUR #NASDAQ #CleanTech`);
+            const url = `https://twitter.com/intent/tweet?text=${text}`;
+            window.open(url, '_blank');
+        }
+
+        // Celebration
+        function celebrateTrade() {
+            playWolfAudio();
+            alert("🐺 'THE ONLY THING STANDING BETWEEN YOU AND YOUR GOAL IS THE BULLSHIT STORY YOU KEEP TELLING YOURSELF!' — HODL $ADUR!");
+        }
+
+        // Document Ready Listener
+        window.addEventListener('DOMContentLoaded', () => {
+            fetchLiveFX();
+            updateMarketClock();
+            setInterval(updateMarketClock, 1000);
+            setInterval(rotateWolfQuote, 8000);
+            runCalculator();
+        });
+    </script>
+</body>
+</html>
